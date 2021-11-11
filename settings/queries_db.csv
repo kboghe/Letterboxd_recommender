@@ -1,0 +1,4 @@
+table;query
+users;"Table('users',metadata, Column('user_id', String(200), primary_key = True, nullable=False),Column('profile_url', String(9999)),Column('dead',Integer),Column('selected',Integer),Column('updated',DateTime))"
+ratings;"Table('ratings',metadata, Column('user_id', String(200), primary_key = True, nullable=False),Column('film_id', String(500),primary_key = True, nullable=False),Column('rating', Integer),Column('love', Integer))"
+letterboxd_imdb;"Table('letterboxd_imdb',metadata, Column('film_id', String(500), primary_key = True, nullable=False),Column('tconst', String(50)),Column('dead', Integer),Column('updated',DateTime))"
