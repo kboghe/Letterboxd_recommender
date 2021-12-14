@@ -30,7 +30,7 @@ operating_systems = [OperatingSystem.WINDOWS.value, OperatingSystem.LINUX.value]
 user_agent_rotator = UserAgent(software_names=software_names, operating_systems=operating_systems, limit=100)
 
 #start VPN rotation#
-#initialize_VPN(save=1,area_input=['complete rotation'])
+#initialize_VPN(save=1,area_input=['europe'])
 
 ###########################
 ######write functions######
@@ -165,17 +165,17 @@ def fetch_profiles(gateway,engine,metadata):
     return movie_prf_df
 def scrape_profiles(engine,update=0):
     if update == 1:
-        add_query = 'AND selected = 1'
-    elif update == 0:
-        add_query = "AND updated < '{}'".format(dt.now().date())
+        update = '{} AND updated < CURDATE() ORDER BY updated'.format(update)
+        upper_wait = 2
     else:
-        raise Exception('Only 0 or 1 are allowed for the update argument')
+        upper_wait = 6
     users = pd.read_sql("SELECT user_id,profile_url FROM users "
-                        "WHERE dead = 0 {}".format(add_query),
+                        "WHERE dead = 0 AND selected = {}".format(update),
                         engine).sample(frac=1).reset_index(drop=True)
     i = 0
     for index,row in tqdm.tqdm(users.iterrows()):
-        time.sleep(random.uniform(2,6))
+        if update == 0:
+            time.sleep(random.uniform(2,upper_wait))
         ratings_db = set(pd.read_sql("SELECT film_id FROM ratings "
                                      "WHERE user_id = '{}'".format(row['user_id']),engine).iloc[:,0])
         user_watched = {key: [] for key in ['film_id','rating','love']}
@@ -318,5 +318,5 @@ engine,metadata = set_connection('settings/connection_db.txt','settings/queries_
 #update_imdb_db = imdb_db_setup(engine)
 #profiles = fetch_profiles('https://letterboxd.com/prof_ratigan/list/top-1000-films-of-all-time/',
 #               engine,metadata)
-#scrape_profiles(engine,update=1)
+scrape_profiles(engine,update=1)
 imdb_link(engine)
